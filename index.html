@@ -49,12 +49,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .brand.split .bl{animation:brandIn .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*55ms + .1s)}
 .brand.split .dot{animation:dotDrop .9s cubic-bezier(.3,.7,.3,1) both .55s}
 .brand.ready .bl{animation:none}
-.brand.ready .dot{animation:dotGlow 3.2s ease-in-out infinite}
 .brand.ready.wave .bl{animation:brandWave .55s cubic-bezier(.3,.6,.3,1) both;animation-delay:calc(var(--i)*38ms)}
 .brand.ready.wave .dot{animation:dotHop .6s cubic-bezier(.3,.6,.3,1) both .27s}
 @keyframes brandIn{from{opacity:0;transform:translateY(.55em) rotate(8deg);filter:blur(6px)}}
 @keyframes dotDrop{0%{opacity:0;transform:translateY(-1.1em)}55%{opacity:1;transform:translateY(0) scale(1.25,.75)}72%{transform:translateY(-.2em) scale(.9,1.1)}88%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}
-@keyframes dotGlow{0%,100%{text-shadow:none}50%{text-shadow:0 0 10px var(--accent),0 0 22px color-mix(in srgb,var(--accent) 50%,transparent)}}
 @keyframes brandWave{40%{transform:translateY(-.22em);color:color-mix(in srgb,var(--accent) 55%,var(--fg))}100%{transform:none}}
 @keyframes dotHop{35%{transform:translateY(-.45em) scale(.9,1.1)}65%{transform:translateY(0) scale(1.2,.8)}100%{transform:none}}
 .links{display:flex;gap:28px;font-size:14px;color:var(--muted)}
@@ -102,7 +100,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* typewriter: the name is typed letter by letter with a blinking caret */
 @keyframes nameShow{to{visibility:visible}}
 @media (prefers-reduced-motion:no-preference){
-  .name{visibility:hidden;animation:nameShow 0s 4s forwards}
+  .name{visibility:hidden;animation:nameShow 0s 2.5s forwards}
   .name.typing{visibility:visible;animation:none}
   .name.typing > span,.name.typing > em{animation:none}
 }
@@ -116,7 +114,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @keyframes nameIn{from{opacity:.001;transform:translateY(40px);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
 .hero .lead{margin-top:22px;max-width:440px;font-size:18px;line-height:1.5;color:color-mix(in srgb,var(--fg) 85%,transparent);animation:nameIn 1s .5s both}
 .hero .ctas{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:28px;margin-top:28px;pointer-events:auto;animation:nameIn 1s .7s both}
-@media (prefers-reduced-motion:no-preference){.hero .lead{animation-delay:1.7s}.hero .ctas{animation-delay:1.9s}}
+@media (prefers-reduced-motion:no-preference){.hero .lead{animation-delay:1s}.hero .ctas{animation-delay:1.15s}}
 .hero .ctas{gap:14px}
 @media (max-width:760px){
   .hero-side{display:none}
@@ -715,14 +713,14 @@ document.querySelectorAll('[data-copy]').forEach(function(b){
     var k=0;
     function typeNext(){
       caret.classList.add('typing');
-      if(k>=chars.length){caret.classList.remove('typing');setTimeout(function(){caret.classList.add('gone')},2600);return}
+      if(k>=chars.length){caret.classList.remove('typing');setTimeout(function(){caret.classList.add('gone')},900);return}
       var c=chars[k++];c.classList.add('on');c.parentNode.insertBefore(caret,c.nextSibling);
-      var next=chars[k],pause=(next&&next.parentNode!==c.parentNode)?260:70+Math.random()*60;
+      var next=chars[k],pause=(next&&next.parentNode!==c.parentNode)?150:42+Math.random()*30;
       setTimeout(typeNext,pause);
     }
     /* caret blinks for a moment before the first key */
     caret.classList.remove('typing');
-    setTimeout(typeNext,550);
+    setTimeout(typeNext,300);
   }
   /* header brand: letters rise in, the dot drops and settles, a wave runs through on hover */
   var brand=document.querySelector('.brand');

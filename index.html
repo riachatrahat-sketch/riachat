@@ -43,6 +43,20 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
 .brand{font-family:var(--display);font-size:22px}
 .brand span{color:var(--accent)}
+.brand.split{display:inline-flex;align-items:baseline}
+.brand .bl,.brand .dot{display:inline-block;will-change:transform}
+.brand .bl{color:inherit}
+.brand.split .bl{animation:brandIn .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*55ms + .1s)}
+.brand.split .dot{animation:dotDrop .9s cubic-bezier(.3,.7,.3,1) both .55s}
+.brand.ready .bl{animation:none}
+.brand.ready .dot{animation:dotGlow 3.2s ease-in-out infinite}
+.brand.ready.wave .bl{animation:brandWave .55s cubic-bezier(.3,.6,.3,1) both;animation-delay:calc(var(--i)*38ms)}
+.brand.ready.wave .dot{animation:dotHop .6s cubic-bezier(.3,.6,.3,1) both .27s}
+@keyframes brandIn{from{opacity:0;transform:translateY(.55em) rotate(8deg);filter:blur(6px)}}
+@keyframes dotDrop{0%{opacity:0;transform:translateY(-1.1em)}55%{opacity:1;transform:translateY(0) scale(1.25,.75)}72%{transform:translateY(-.2em) scale(.9,1.1)}88%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}
+@keyframes dotGlow{0%,100%{text-shadow:none}50%{text-shadow:0 0 10px var(--accent),0 0 22px color-mix(in srgb,var(--accent) 50%,transparent)}}
+@keyframes brandWave{40%{transform:translateY(-.22em);color:color-mix(in srgb,var(--accent) 55%,var(--fg))}100%{transform:none}}
+@keyframes dotHop{35%{transform:translateY(-.45em) scale(.9,1.1)}65%{transform:translateY(0) scale(1.2,.8)}100%{transform:none}}
 .links{display:flex;gap:28px;font-size:14px;color:var(--muted)}
 .links a:hover{color:var(--fg)}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;font-family:var(--body);transition:background .2s,border-color .2s,color .2s}
@@ -713,6 +727,16 @@ document.querySelectorAll('[data-copy]').forEach(function(b){
     caret.classList.remove('typing');
     setTimeout(typeNext,550);
   }
+  /* header brand: letters rise in, the dot drops and settles, a wave runs through on hover */
+  var brand=document.querySelector('.brand');
+  if(brand&&!reduce){ var dot=brand.querySelector('span'),word=brand.firstChild.textContent,ls=[];
+    brand.setAttribute('aria-label',brand.textContent);brand.firstChild.remove();
+    for(var bi=0;bi<word.length;bi++){var l=document.createElement('span');l.className='bl';l.style.setProperty('--i',bi);l.textContent=word[bi];l.setAttribute('aria-hidden','true');brand.insertBefore(l,dot);ls.push(l)}
+    dot.className='dot';dot.setAttribute('aria-hidden','true');brand.classList.add('split');
+    dot.addEventListener('animationend',function(e){if(e.animationName==='dotDrop')brand.classList.add('ready');if(e.animationName==='dotHop')brand.classList.remove('wave')});
+    function wave(){if(!brand.classList.contains('ready')||brand.classList.contains('wave'))return;brand.classList.add('wave')}
+    brand.addEventListener('pointerenter',wave);brand.addEventListener('focus',wave); }
+
   /* header links: scramble the label into 01/— glyphs, then resolve left to right */
   if(!reduce){
     var GLYPHS='01/—-·';

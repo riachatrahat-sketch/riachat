@@ -77,11 +77,26 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--fg);opacity:.75;margin-bottom:6px}
 .name{font-size:clamp(78px,12.5vw,196px);line-height:.92;white-space:nowrap;color:#f3f0e8;text-shadow:0 10px 60px rgba(0,0,0,.55);letter-spacing:-.02em}
 .name em{color:#f3f0e8}
-.name span,.name em{display:inline-block;animation:nameIn 1.2s cubic-bezier(.2,.7,.2,1) both}
-.name em{animation-delay:.15s}
+.name > span,.name > em{display:inline-block;animation:nameIn 1.2s cubic-bezier(.2,.7,.2,1) both}
+.name > em{animation-delay:.15s}
+/* typewriter: the name is typed letter by letter with a blinking caret */
+@keyframes nameShow{to{visibility:visible}}
+@media (prefers-reduced-motion:no-preference){
+  .name{visibility:hidden;animation:nameShow 0s 4s forwards}
+  .name.typing{visibility:visible;animation:none}
+  .name.typing > span,.name.typing > em{animation:none}
+}
+.name .ch{visibility:hidden}
+.name .ch.on{visibility:visible}
+.name .caret{display:inline-block;position:relative;width:0;height:1em;vertical-align:baseline}
+.name .caret::after{content:"";position:absolute;left:.03em;bottom:-.04em;width:.055em;height:.86em;background:var(--accent);border-radius:2px;box-shadow:0 0 18px color-mix(in srgb,var(--accent) 60%,transparent);animation:caretBlink 1s steps(1) infinite}
+.name .caret.typing::after{animation:none}
+.name .caret.gone{opacity:0;transition:opacity .6s}
+@keyframes caretBlink{50%{opacity:0}}
 @keyframes nameIn{from{opacity:.001;transform:translateY(40px);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
 .hero .lead{margin-top:22px;max-width:440px;font-size:18px;line-height:1.5;color:color-mix(in srgb,var(--fg) 85%,transparent);animation:nameIn 1s .5s both}
 .hero .ctas{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:28px;margin-top:28px;pointer-events:auto;animation:nameIn 1s .7s both}
+@media (prefers-reduced-motion:no-preference){.hero .lead{animation-delay:1.7s}.hero .ctas{animation-delay:1.9s}}
 .btn.pill{background:var(--panel-2);border-color:#34343f;padding:13px 22px}
 .link-under{display:inline-flex;gap:22px;align-items:center;font-size:14px;padding-bottom:6px;border-bottom:1px solid var(--fg)}
 .link-under:hover{color:var(--accent);border-color:var(--accent)}
@@ -92,7 +107,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   #dots{width:min(118%,520px)}
   .hero-copy{top:36%}
   .name{font-size:clamp(56px,16vw,96px);white-space:normal}
-  .name span,.name em{display:block}
+  .name > span,.name > em{display:block}
   .hero .lead{font-size:16px;padding-inline:8px}
   .hero .ctas{gap:18px}
 }
@@ -674,6 +689,30 @@ document.querySelectorAll('[data-copy]').forEach(function(b){
   var bar=document.getElementById('progress');
   function prog(){var h=document.documentElement,m=h.scrollHeight-h.clientHeight;if(bar)bar.style.transform='scaleX('+(m>0?h.scrollTop/m:0)+')'}
   addEventListener('scroll',prog,{passive:true});prog();
+  /* hero name: type it out letter by letter */
+  var nameEl=document.querySelector('.name');
+  if(nameEl&&!reduce){
+    var chars=[],caret=document.createElement('span');
+    caret.className='caret typing';caret.setAttribute('aria-hidden','true');
+    nameEl.setAttribute('aria-label',nameEl.textContent.replace(/\s+/g,' ').trim());
+    Array.prototype.forEach.call(nameEl.children,function(word){
+      var txt=word.textContent;word.textContent='';word.setAttribute('aria-hidden','true');
+      for(var i=0;i<txt.length;i++){var c=document.createElement('span');c.className='ch';c.textContent=txt[i];word.appendChild(c);chars.push(c)}
+    });
+    chars[0].parentNode.insertBefore(caret,chars[0]);
+    nameEl.classList.add('typing');
+    var k=0;
+    function typeNext(){
+      caret.classList.add('typing');
+      if(k>=chars.length){caret.classList.remove('typing');setTimeout(function(){caret.classList.add('gone')},2600);return}
+      var c=chars[k++];c.classList.add('on');c.parentNode.insertBefore(caret,c.nextSibling);
+      var next=chars[k],pause=(next&&next.parentNode!==c.parentNode)?260:70+Math.random()*60;
+      setTimeout(typeNext,pause);
+    }
+    /* caret blinks for a moment before the first key */
+    caret.classList.remove('typing');
+    setTimeout(typeNext,550);
+  }
   /* header links: scramble the label into 01/— glyphs, then resolve left to right */
   if(!reduce){
     var GLYPHS='01/—-·';
